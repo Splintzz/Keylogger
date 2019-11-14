@@ -13,7 +13,7 @@ import datetime
 #Timeout when to store keys
 #Encode password
 
-uri = "mongodb+srv://spencercarr3:Xcalizorz<3@cluster0-0zt9p.mongodb.net/test?retryWrites=true&w=majority"
+uri = "placeholder"
 
 keys_typed = ""
 log = ""
