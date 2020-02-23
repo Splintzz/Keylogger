@@ -1,10 +1,10 @@
 connection_string = "MONGO_CONN_STRING"
 
-database = "Logged_Keys"
+database = #Enter database name
 
-collection = "keys"
+collection = #Enter database collection name
 
-log_title = "Keylog"
+log_title = #Enter log title 
 
 recorded_space = "Key.space"
 

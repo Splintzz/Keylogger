@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 start_time = datetime.datetime.now().strftime(Constants.time_format_setting)
 
-uri = #enter connection string here
+uri = #Enter connection string from Mongo DB
 
 keys_typed = ""
 log = ""
